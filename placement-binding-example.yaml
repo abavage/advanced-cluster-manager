@@ -5,9 +5,10 @@ kind: Policy
 metadata:
   annotations:
     policy.open-cluster-management.io/categories: CA Security Assessment and Authorization
-    policy.open-cluster-management.io/controls: CA-2 Security Assessments, CA-7 Continuous Monitoring
+    policy.open-cluster-management.io/controls: CA-2 Security Assessments, CA-7 Continuous
+      Monitoring
     policy.open-cluster-management.io/standards: NIST SP 800-53
-  generation: 3
+  generation: 14
   name: compliance-operator
   namespace: cluster-policies
 spec:
@@ -26,6 +27,22 @@ spec:
             kind: Namespace
             metadata:
               name: openshift-compliance
+        pruneObjectBehavior: None
+        remediationAction: enforce
+        severity: high
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: bob
+      spec:
+        object-templates:
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: v1
+            kind: Namespace
+            metadata:
+              name: bob
         pruneObjectBehavior: None
         remediationAction: enforce
         severity: high
@@ -53,6 +70,34 @@ spec:
           source: redhat-operators
           sourceNamespace: openshift-marketplace
         upgradeApproval: Automatic
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: scansetting-default
+      spec:
+        object-templates:
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: compliance.openshift.io/v1alpha1
+            autoApplyRemediations: false
+            kind: ScanSetting
+            metadata:
+              name: default-scan
+              namespace: openshift-compliance
+            rawResultStorage:
+              nodeSelector:
+                node-role.kubernetes.io/worker: ""
+              pvAccessModes:
+              - ReadWriteOnce
+              rotation: 5
+              size: 5Gi
+            roles:
+            - worker
+            schedule: '*/5 * * * *'
+        remediationAction: enforce
+        severity: high
+
 
 ---
 $ oc get placements  compliance-operator-placement -o yaml
