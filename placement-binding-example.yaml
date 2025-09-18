@@ -1,5 +1,5 @@
 ---
-$ oc get policy compliance-operator -o yaml
+#$ oc get policy compliance-operator -o yaml
 apiVersion: policy.open-cluster-management.io/v1
 kind: Policy
 metadata:
@@ -97,10 +97,33 @@ spec:
             schedule: '*/5 * * * *'
         remediationAction: enforce
         severity: high
-
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: scansettingbinding
+      spec:
+        object-templates:
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: compliance.openshift.io/v1alpha1
+            kind: ScanSettingBinding
+            metadata:
+              name: cis-compliance
+              namespace: openshift-compliance
+            profiles:
+              - name: ocp4-cis-node
+                kind: Profile
+                apiGroup: compliance.openshift.io/v1alpha1
+            settingsRef:
+              name: default-scan
+              kind: ScanSetting
+              apiGroup: compliance.openshift.io/v1alpha1
+        remediationAction: enforce
+        severity: high
 
 ---
-$ oc get placements  compliance-operator-placement -o yaml
+#$ oc get placements  compliance-operator-placement -o yaml
 apiVersion: cluster.open-cluster-management.io/v1beta1
 kind: Placement
 metadata:
@@ -116,7 +139,7 @@ spec:
     operator: Exists
 
 ---
-$ oc get placementbinding compliance-operator-placement -o yaml
+#$ oc get placementbinding compliance-operator-placement -o yaml
 apiVersion: policy.open-cluster-management.io/v1
 kind: PlacementBinding
 metadata:
