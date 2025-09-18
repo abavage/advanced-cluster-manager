@@ -1,0 +1,8 @@
+# Need this to import clusters when acm is running on ROSA HCP
+apiVersion: config.open-cluster-management.io/v1alpha1
+kind: KlusterletConfig
+metadata:
+  name: global
+spec:
+  # update with this
+  hubKubeAPIServerCABundle: CERT=$(curl -s https://letsencrypt.org/certs/isrgrootx1.pem | base64 | tr -d "\n")
