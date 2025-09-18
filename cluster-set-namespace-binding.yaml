@@ -1,0 +1,17 @@
+---
+$ oc get ns cluster-policies -o yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: cluster-policies
+
+---
+# enables the creation of polocies to be created in cluster-policies and not the default open-cluster-management-global-set
+$ oc get ManagedClusterSetBinding global -n cluster-policies -o yaml
+apiVersion: cluster.open-cluster-management.io/v1beta2
+kind: ManagedClusterSetBinding
+metadata:
+  name: global
+  namespace: cluster-policies
+spec:
+  clusterSet: global
