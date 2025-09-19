@@ -1,0 +1,94 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  labels:
+    kubernetes.io/metadata.name: open-cluster-management-observability
+  name: open-cluster-management-observability
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: thanos-object-storage
+  namespace: open-cluster-management-observability
+type: Opaque
+stringData:
+  thanos.yaml: |
+    type: s3
+    config:
+      bucket: one-acm-observability
+      endpoint: s3.ap-southeast-2.amazonaws.com
+      signature_version2: false
+
+#---
+#apiVersion: observability.open-cluster-management.io/v1beta2
+#kind: MultiClusterObservability
+#metadata:
+#  name: observability
+#spec:
+#  observabilityAddonSpec: {}
+#  storageConfig:
+#    metricObjectStorage:
+#      name: thanos-object-storage
+#      key: thanos.yaml
+#  advanced:
+#    compact:
+#       serviceAccountAnnotations:
+#           eks.amazonaws.com/role-arn: arn:aws:iam::235494778649:role/one-acm_observability
+#    store:
+#       serviceAccountAnnotations:
+#          eks.amazonaws.com/role-arn: arn:aws:iam::235494778649:role/one-acm_observability
+#    rule:
+#       serviceAccountAnnotations:
+#          eks.amazonaws.com/role-arn: arn:aws:iam::235494778649:role/one-acm_observability
+#    receive:
+#       serviceAccountAnnotations:
+#          eks.amazonaws.com/role-arn: arn:aws:iam::235494778649:role/one-acm_observability
+#    query:
+#       serviceAccountAnnotations:
+#          eks.amazonaws.com/role-arn: arn:aws:iam::235494778649:role/one-acm_observability
+
+---
+apiVersion: observability.open-cluster-management.io/v1beta2
+kind: MultiClusterObservability
+metadata:
+  name: observability
+spec:
+  advanced:
+    compact:
+      serviceAccountAnnotations:
+        eks.amazonaws.com/role-arn: arn:aws:iam::235494778649:role/one-acm_observability
+    query:
+      serviceAccountAnnotations:
+        eks.amazonaws.com/role-arn: arn:aws:iam::235494778649:role/one-acm_observability
+    receive:
+      serviceAccountAnnotations:
+        eks.amazonaws.com/role-arn: arn:aws:iam::235494778649:role/one-acm_observability
+    rule:
+      serviceAccountAnnotations:
+        eks.amazonaws.com/role-arn: arn:aws:iam::235494778649:role/one-acm_observability
+    store:
+      serviceAccountAnnotations:
+        eks.amazonaws.com/role-arn: arn:aws:iam::235494778649:role/one-acm_observability
+    retentionConfig:
+      retentionResolutionRaw: 365d # how to keep in the bucket
+      retentionResolution5m: 365d
+      retentionResolution1h: 365d
+      retentionInLocal: 48h # how long to keep on disk
+  enableDownsampling: true
+  observabilityAddonSpec:
+    enableMetrics: true
+    interval: 300
+    scrapeSizeLimitBytes: 1073741824
+    workers: 1
+  storageConfig:
+    alertmanagerStorageSize: 1Gi
+    compactStorageSize: 100Gi
+    metricObjectStorage:
+      key: thanos.yaml
+      name: thanos-object-storage
+    receiveStorageSize: 100Gi
+    ruleStorageSize: 1Gi
+    storageClass: gp3-csi-kms
+    storeStorageSize: 10Gi

@@ -4,5 +4,5 @@ kind: KlusterletConfig
 metadata:
   name: global
 spec:
-  # update with this
-  hubKubeAPIServerCABundle: CERT=$(curl -s https://letsencrypt.org/certs/isrgrootx1.pem | base64 | tr -d "\n")
+  # update with this CERT=$(curl -s https://letsencrypt.org/certs/isrgrootx1.pem | base64 | tr -d "\n")
+  hubKubeAPIServerCABundle: LS0tL...==
